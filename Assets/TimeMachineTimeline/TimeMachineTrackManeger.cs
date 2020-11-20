@@ -10,6 +10,9 @@ using UnityEngine.Timeline;
 using UnityEngine.UI;
 
 
+
+#if UNITY_EDITOR
+
 [CustomEditor(typeof(TimeMachineTrackManeger))]
 public class TimeMachineTrackEditor : Editor
 {
@@ -23,7 +26,7 @@ public class TimeMachineTrackEditor : Editor
         }
     }
 }
-
+#endif
 [Serializable]
 public struct TimeMachineControlClipValue
 {

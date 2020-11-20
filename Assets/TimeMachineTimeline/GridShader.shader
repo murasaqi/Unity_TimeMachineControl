@@ -5,7 +5,7 @@
       _MainColor("Main Color", Color) = (0.5, 1.0, 1.0)
       _SecondaryColor("Secondary Color", Color) = (0.0, 0.0, 0.0)
       _BackgroundColor("Background Color", Color) = (0.0, 0.0, 0.0, 0.0)
-      _MaskTexture("Texture", 2D) = "white" {}
+      _MainTex("Texture", 2D) = "white" {}
       _Scale_U("U Scale", Float) = 1.0
       _Scale_V("V Scale", Float) = 1.0
       [Header(Grid)]
@@ -13,6 +13,12 @@
       //_GraduationScale("Graduation Scale", Float) = 1.0
       _Thickness("Lines Thickness", Range(0.0001, 0.01)) = 0.005
       _SecondaryFadeInSpeed("Secondary Fade In Speed", Range(0.1, 4)) = 0.5
+       _StencilComp ("Stencil Comparison", Float) = 8.000000
+       _Stencil ("Stencil ID", Float) = 0.000000
+       _StencilOp ("Stencil Operation", Float) = 0.000000
+       _StencilWriteMask ("Stencil Write Mask", Float) = 255.000000
+       _StencilReadMask ("Stencil Read Mask", Float) = 255.000000
+       _ColorMask ("Color Mask", Float) = 15.000000
    }
    
    SubShader
@@ -24,8 +30,10 @@
       ZWrite On // We need to write in depth to avoid tearing issues
       Blend SrcAlpha OneMinusSrcAlpha
       Stencil {
-          Ref 1 // リファレンス値
-         Comp Equal
+         Ref 1
+       Comp equal
+       Pass keep 
+       ZFail decrWrap
       }
       Pass
       {
@@ -54,8 +62,8 @@
          sampler2D _GridTexture;
          float4 _GridTexture_ST;
 			
-         sampler2D _MaskTexture;
-         float4 _MaskTexture_ST;
+         sampler2D _MainTex;
+         float4 _MainTex_ST;
 
          float _Scale;
          float _GraduationScale;
@@ -80,7 +88,7 @@
             o.uv *= float2(_Scale_U,_Scale_V);
 
             // UVs for mask texture
-            o.uv1 = TRANSFORM_TEX(v.uv1, _MaskTexture);
+            o.uv1 = TRANSFORM_TEX(v.uv1, _MainTex);
             return o;
          }
 
@@ -92,7 +100,7 @@
          fixed4 frag (v2f i) : SV_Target
          {
             fixed4 col = _MainColor;
-            fixed4 maskCol = tex2D(_MaskTexture, i.uv1);
+            fixed4 maskCol = tex2D(_MainTex, i.uv1);
 				
             // With the ceil value of the log10 of the scale, we obtain the closest measure unit above (eg : 165 -> 3, 0.146 -> 0, 0.001 -> -3)
             // Then, we do 10^(this value) to get the actual value of that unit in meters
