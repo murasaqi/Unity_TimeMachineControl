@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.EventSystems;
 using UnityEngine.Playables;
 using UnityEngine.Timeline;
@@ -53,6 +54,12 @@ public class TimeMachineTrackManeger : MonoBehaviour
     
     public delegate void NextStateHandler();
     public delegate void InitHandler();
+
+    public delegate void ForceMoveClip(int index);
+    public event NextStateHandler OnNextState;
+    public event InitHandler OnInit;
+    public event ForceMoveClip OnForceMoveClip;
+    
     [SerializeField] private Vector2 minWindowSize = new Vector2(800,280);
     [SerializeField] private TimelineAsset timelineAsset;
     [SerializeField] private RectTransform clipContainer;
@@ -92,6 +99,8 @@ public class TimeMachineTrackManeger : MonoBehaviour
     private Vector2 onGrabStartWindowPosition = new Vector2();
     private Vector2 onGrabStartWindowSize = new Vector2();
     private Canvas canvas;
+
+    public UnityEvent onEndInitialize;
     private Color clipColor(TimeMaschineClipEvent clipEvent)
     {
         if (clipEvent == TimeMaschineClipEvent.PAUSE)
@@ -135,11 +144,7 @@ public class TimeMachineTrackManeger : MonoBehaviour
 
     private Image recentClipImage = null;
 
-    // private int _currentClipCount = 0;
-    public int currentInputCount { get; set; } = 0;
-    public event NextStateHandler OnNextState;
-    public event InitHandler OnInit;
-
+   
     public double frameDuration => 1d / timelineAsset.editorSettings.fps;
     private void OnValidate()
     {
@@ -308,10 +313,11 @@ public class TimeMachineTrackManeger : MonoBehaviour
         windowResizeEventTrigger.triggers.Add(onResizeEnd);
 
         clipContainer.parent.GetComponent<RectTransform>().anchoredPosition = Vector2.zero;
-        // var windowTrigger = timelineGuiWindow.gameObject.AddComponent<EventTrigger>();
-        // var onBeginWheel = new EventTrigger.Entry();
-        // onBeginWheel.eventID = EventTriggerType.PointerEnter;
-        // onBeginWheel
+        
+        playLeftArrow.onClick.AddListener(MovePreviousClip);
+        playRightArrow.onClick.AddListener(MoveNextClip);
+
+        onEndInitialize?.Invoke();
     }
 
     private Vector2 GetMousePos()
@@ -346,49 +352,6 @@ public class TimeMachineTrackManeger : MonoBehaviour
     }
 
   
-    //
-    // void Awake()
-    // {
-    //     Clear();
-    // }
-    //
-    // private void Start()
-    // {
-    //     Timeline.time = 0f;
-    //     Timeline.Pause();
-    // }
-    //
-    // public void Clear()
-    // {
-    //     clipValus.Clear();
-    //     foreach (var child in clips)
-    //     {
-    //         DestroyImmediate(child);
-    //     }
-    //
-    //     foreach (Transform child in transform)
-    //     {
-    //         DestroyImmediate(child.gameObject);
-    //     }
-    //
-    //     clips.Clear();
-    // }
-    //
-    // public void InitGui()
-    // {
-    //
-    //     Clear();
-    //     recentClipImage = null;
-    //
-    // }
-    //
-    //
-    // public void InitTimelineClips()
-    // {
-    //     OnInit();
-    // }
-    //
-
     private void OnSeek()
     {
         OnButtonPause();
@@ -425,7 +388,7 @@ public class TimeMachineTrackManeger : MonoBehaviour
         timeCode.text = $"{m.ToString("00")}:{s.ToString("00")}:{ms.ToString("00")}";
     }
 
-    private TimeMachineControlClipValue currentClipValue => clipValues[currentInputCount];
+    private TimeMachineControlClipValue currentClipValue => clipValues[currentClipCount];
 
     public void EnableClickButton()
     {
@@ -478,44 +441,32 @@ public class TimeMachineTrackManeger : MonoBehaviour
             c.a = (Mathf.Sin(DateTime.Now.Millisecond*0.001f * Mathf.PI*2)+1)/2f * 0.5f + 0.5f;
             blinkButton.SetColor(c);
         }
-        // if (Input.GetKeyDown(KeyCode.RightArrow))
-        // {
-        //     Timeline.time = Mathf.Clamp((float)Timeline.time + 5f, 0f, (float)Timeline.duration);
-        // }
-        //
-        // if (Input.GetKeyDown(KeyCode.LeftArrow))
-        // {
-        //     Timeline.time = Mathf.Clamp((float)Timeline.time - 5f, 0f, (float)Timeline.duration);
-        // }
-        //
-        // seekBar.value = (float)(Timeline.time / Timeline.duration);
-        // if (debugMode)
-        // {
-        //     if (Input.GetKeyDown("s"))
-        //     {
-        //         nextStateHandler();
-        //     }
-        //
-        // }
-        //
-        // if (recentClipImage)
-        // {
-        //     var a = Mathf.Abs(Mathf.Sin(Time.time * 1.2f));
-        //     var color = recentClipColor;
-        //     if (currentClipStatus == ClipStatus.LOOP)
-        //     {
-        //         color = loopClipColor;
-        //     }
-        //
-        //     //                Debug.Log(currentClipStatus);
-        //     recentClipImage.color = new Color(color.r, color.g, color.b, Mathf.Clamp(a, 0.4f, 1f));
-        // }
-        //
-        // if (Timeline.state == PlayState.Paused)
-        // {
-        //     Timeline.Evaluate();
-        // }
-        //
+      
+    }
+
+    public void MoveNextClip()
+    {
+        MoveClip(currentClipCount + 1);
+    }
+    public void MovePreviousClip()
+    {
+        var index = currentClipCount - 1;
+        if (playableDirector.time > currentClipValue.start) index = currentClipCount;
+        MoveClip(index);
+    }
+    public void MoveClip(int index)
+    {
+        OnButtonPause();
+
+        var i = Mathf.Clamp(index, 0, clipValues.Count - 1);
+        if (clipsButtons != null)
+        {
+            // var next = clipValues[i];
+            OnForceMoveClip.Invoke(i);
+            MoveSeekBar();
+            UpdateTimeCode();
+        }
+        
     }
     
     // public void UpdateStatus()

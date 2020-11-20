@@ -17,7 +17,7 @@ public class TimeMachineControlMixer : PlayableBehaviour
     private TimeMachineControlBehaviour currentInput = null;
     public bool initialized = false;
     private TimeMachineTrackManeger trackBinding = null;
-    private int currentInputCount = -1;
+    private int currentInputCount = 0;
     private bool initValues = false;
     
     
@@ -33,25 +33,10 @@ public class TimeMachineControlMixer : PlayableBehaviour
             Init(playable);
             trackBinding.OnNextState += OnNextState;
             trackBinding.OnInit += InitEvents;
-            
+            trackBinding.OnForceMoveClip += ForceMoveClip;
+
 
         }
-
-        // if (!initValues)
-        // {
-        //     var count = 0;
-        //     foreach (var c in clips)
-        //     {
-        //         var inputPlayable = (ScriptPlayable<TimeMachineControlBehaviour>)playable.GetInput(count);
-        //         var input = inputPlayable.GetBehaviour();
-        //         input.isFinishRole = false;
-        //         count++;
-        //     }
-        //
-        //     m_PlayableDirector.time = 0;
-        //     InitClipViewer();
-        //     initValues = true;
-        // }
 
         
         if (trackBinding.clipCount != clips.Count)
@@ -156,6 +141,7 @@ public class TimeMachineControlMixer : PlayableBehaviour
             clipValues.duration = c.duration;
             clipValues.index = count;
             clipValues.clipEvent = input.timeMachineClipEvent;
+            clipValues.start = c.start;
             timelineControlBehaviourList.Add(clipValues);
             input.isFinishRole = false;
             count++;
@@ -166,6 +152,29 @@ public class TimeMachineControlMixer : PlayableBehaviour
         initialized = true;
     }
 
+    private void ForceMoveClip(int index)
+    {
+        if (inputs != null)
+        {
+            for (int i = 0; i < inputs.Count; i++)
+            {
+                if (i < index)
+                {
+                    inputs[i].isFinishRole = true;
+                }
+
+                if (i == index)
+                {
+                    inputs[i].isFinishRole = false;
+                    m_PlayableDirector.time = clips[i].start;
+                    m_PlayableDirector.Pause();
+                    currentInput = inputs[i];
+                    currentInputCount = i;
+                    trackBinding.currentClipCount = currentInputCount;
+                }
+            }
+        }
+    }
     private void OnNextState()
 
     {
