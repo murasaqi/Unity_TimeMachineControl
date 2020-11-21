@@ -368,6 +368,13 @@ public class TimeMachineTrackManeger : MonoBehaviour
         // OnButtonPause();
         UpdateTimeCode();
     }
+
+    public void SeekTo(double time)
+    {
+        OnButtonPause();
+        playableDirector.time = time;
+        OnSeek();
+    }
     
 
     private void OnButtonPlay()
@@ -421,6 +428,8 @@ public class TimeMachineTrackManeger : MonoBehaviour
         MoveSeekBar();
         UpdateTimeCode();
     }
+    
+    
 
     private void MoveSeekBar()
     {

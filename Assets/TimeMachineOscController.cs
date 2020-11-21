@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 [Serializable]
 public class TimeMachineOscEvent
@@ -9,13 +10,16 @@ public class TimeMachineOscEvent
     public string name;
     public string address;
     public int index;
+    public OscMessage oscMessage;
 }
 public class TimeMachineOscController : MonoBehaviour
 {
     [SerializeField] private TimeMachineTrackManeger timeMachineTrackManeger;
     [SerializeField] private TimeMachineOscEventUI timeMachineOscEventUI;
+    [SerializeField] private TimeMachineOscEventUI timeMachinePlainOscEventUI;
     [SerializeField] private RectTransform oscEventUiContainer; 
     [SerializeField] private List<TimeMachineOscEvent> timeMachineOscEvents;
+    [SerializeField] private Button addNewEventButton;
     [SerializeField] private OscIn oscIn;
     [SerializeField] private OscOut oscOut;
     // private OscMessage testMessage;
@@ -57,6 +61,22 @@ public class TimeMachineOscController : MonoBehaviour
     private void OnEnable()
     {
         
+    }
+
+    public void AddNewEvent()
+    {
+        var oscEventValue = new TimeMachineOscEvent();
+        oscEventValue.address = "/Test";
+        oscEventValue.index = 0;
+        oscEventValue.name = "Test";
+        timeMachineOscEvents.Add(oscEventValue);
+        // oscIn.MapInt(  oscEventValue.address,OnReceiveMoveClipEvent );
+        var ui =Instantiate(timeMachinePlainOscEventUI, oscEventUiContainer);
+        ui.oscEvent = oscEventValue;
+        var message = new OscMessage();
+        message.address = ui.oscAddress;
+        message.Add(oscEventValue.index);
+        ui.SetTestOscMessage(oscOut,message);
     }
 
     public void OnReceiveMoveClipEvent( int index )
