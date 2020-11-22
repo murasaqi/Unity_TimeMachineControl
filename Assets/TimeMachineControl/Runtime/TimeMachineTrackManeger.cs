@@ -90,7 +90,7 @@ public class TimeMachineTrackManeger : MonoBehaviour
     [SerializeField] private Texture2D iconEnlarge;
     
     [SerializeField] private RectTransform seekBar;
-    [SerializeField] private int seekBarWidth = 20;
+    // [SerializeField] private int seekBarWidth = 20;
     [SerializeField] private RectTransform seekArea;
     [SerializeField] private Button playLeftArrow;
     [SerializeField] private Button playRightArrow;
@@ -137,15 +137,10 @@ public class TimeMachineTrackManeger : MonoBehaviour
     // private Color onEndClipColor = Color.yellow;
     public int currentClipCount = 0;
     
-    private double pauseTime = -1f;
-    private bool pause = false;
-    
     public int clipCount
     {
         get => transform.childCount;
     }
-
-    private Image recentClipImage = null;
 
    
     public double frameDuration => 1d / timelineAsset.editorSettings.fps;

@@ -1,0 +1,10 @@
+{
+  "name": "com.murasaqi.timemachinecontrol",
+  "displayName": "TimeMachineControl",
+  "version": "0.1.0",
+  "unity": "2020.1",
+  "description": "TimeMachineControl",
+  "author": {
+    "name": "murasaqi"
+  }
+}
