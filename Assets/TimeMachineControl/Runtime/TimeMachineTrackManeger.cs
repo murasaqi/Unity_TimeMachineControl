@@ -49,7 +49,7 @@ public enum TimeMaschineClipEvent
 
 
 [RequireComponent(typeof(Canvas))]
-[RequireComponent(typeof(PlayableDirector))]
+// [RequireComponent(typeof(PlayableDirector))]
 // [ExecuteInEditMode] 
 
 public class TimeMachineTrackManeger : MonoBehaviour
@@ -58,11 +58,12 @@ public class TimeMachineTrackManeger : MonoBehaviour
     public delegate void NextStateHandler();
     public delegate void InitHandler();
 
+    private bool visible = true;
     public delegate void ForceMoveClip(int index);
     public event NextStateHandler OnNextState;
     public event InitHandler OnInit;
     public event ForceMoveClip OnForceMoveClip;
-    
+    [SerializeField] private KeyCode toggleVisibleKey = KeyCode.D;
     [SerializeField] private Vector2 minWindowSize = new Vector2(800,280);
     [SerializeField] private TimelineAsset timelineAsset;
     [SerializeField] private RectTransform clipContainer;
@@ -78,7 +79,7 @@ public class TimeMachineTrackManeger : MonoBehaviour
     [SerializeField] private int clipStartX = 20;
     [SerializeField] private int clipSpace = 0;
     [SerializeField] private int trackEndMargin = 200;
-    private PlayableDirector playableDirector;
+    [SerializeField]  PlayableDirector playableDirector;
 
     [SerializeField] private TMP_InputField timeCode;
     [SerializeField] private Button playButton;
@@ -151,7 +152,7 @@ public class TimeMachineTrackManeger : MonoBehaviour
 
     private void Start()
     {
-        playableDirector = GetComponent<PlayableDirector>();
+        // playableDirector = GetComponent<PlayableDirector>();
         if(playableDirector.state != PlayState.Playing)playableDirector.Play();
         // InitGui();
     }
@@ -194,10 +195,10 @@ public class TimeMachineTrackManeger : MonoBehaviour
                 
                 var c = AddClip(clip);
                 var clipRect  = c.GetComponent<RectTransform>();
-                clipRect.anchoredPosition = new Vector2(x,0);
-                x += clipRect.rect.width;
+                clipRect.anchoredPosition = new Vector2((float)clip.start * pixelPerSec + clipStartX,0);
+                // x += clipRect.rect.width;
                 clipsButtons.Add(c);
-                x += clipSpace;
+                // x += clipSpace;
             }
             
         }
@@ -435,6 +436,18 @@ public class TimeMachineTrackManeger : MonoBehaviour
     private void Update()
     {
 
+        if (Input.GetKeyDown(toggleVisibleKey))
+        {
+            visible = !visible;
+            if (!visible)
+            {
+                GetComponent<Canvas>().sortingOrder = -10;
+            }
+            else
+            {
+                GetComponent<Canvas>().sortingOrder = 1;
+            }
+        }
         if (playableDirector.state == PlayState.Playing)
         {
             MoveSeekBar();

@@ -11,8 +11,10 @@ public class TimeMachineOscEventUI : MonoBehaviour
     [SerializeField] private TMP_InputField inPutAddress;
     [SerializeField] private Button button;
     [SerializeField] private TimeMachineOscEvent timeMachineOscEvent;
-
+    public OscIn oscIn;
     private OscOut _oscOut;
+
+    public TimeMachineOscController controller;
     // private string _eventName;
     public string eventName
     {
@@ -39,7 +41,22 @@ public class TimeMachineOscEventUI : MonoBehaviour
         {
             if (inPutAddress == null) inPutAddress = GetComponentInChildren<TMP_InputField>();
             inPutAddress.text = value;
+            
         }
+    }
+
+    public void InitOSCEvent()
+    {
+        var newOscEventValue = new TimeMachineOscEvent();
+        newOscEventValue.address = oscAddress;
+        newOscEventValue.index = timeMachineOscEvent.index;
+        newOscEventValue.name = timeMachineOscEvent.name;
+        oscIn.MapInt(  newOscEventValue.address,controller.OnReceiveMoveClipEvent );
+        oscEvent = newOscEventValue;
+        var message = new OscMessage();
+        message.address = newOscEventValue.address;
+        message.Add(newOscEventValue.index);
+        testOscMessage = message;
     }
     
     public Button testButton
@@ -100,7 +117,10 @@ public class TimeMachineOscEventUI : MonoBehaviour
         inPutAddress.onValueChanged.AddListener((text) =>
         {
             timeMachineOscEvent.address = text;
+            InitOSCEvent();
         });
+        
+        
     }
 
     // Update is called once per frame

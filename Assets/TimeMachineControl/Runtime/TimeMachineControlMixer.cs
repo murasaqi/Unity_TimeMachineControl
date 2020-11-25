@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.Playables;
 using UnityEngine.Timeline;
 using System.Collections.Generic;
+using UnityEditor;
 
 
 public class TimeMachineControlMixer : PlayableBehaviour
@@ -80,6 +81,7 @@ public class TimeMachineControlMixer : PlayableBehaviour
             {
 
                 trackBinding.EnableClickButton();
+
                 m_PlayableDirector.time = clip.end- trackBinding.frameDuration;
                 break;
 

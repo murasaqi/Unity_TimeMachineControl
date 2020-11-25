@@ -48,6 +48,8 @@ public class TimeMachineOscController : MonoBehaviour
             timeMachineOscEvents.Add(oscEventValue);
             oscIn.MapInt(  oscEventValue.address,OnReceiveMoveClipEvent );
             var ui =Instantiate(timeMachineOscEventUI, oscEventUiContainer);
+            ui.oscIn = oscIn;
+            ui.controller = this;
             ui.oscEvent = oscEventValue;
             var message = new OscMessage();
             message.address = ui.oscAddress;
