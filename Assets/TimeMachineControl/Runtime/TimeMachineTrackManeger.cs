@@ -387,11 +387,13 @@ public class TimeMachineTrackManeger : MonoBehaviour
 
     private void UpdateTimeCode()
     {
-        var t = (float) playableDirector.time;
-        var m = Mathf.FloorToInt(t / 60);
-        var s = Mathf.FloorToInt(t -Mathf.FloorToInt(m));
-        var ms = (t-Mathf.FloorToInt(t))*100;
-        timeCode.text = $"{m.ToString("00")}:{s.ToString("00")}:{ms.ToString("00")}";
+        var seconds = Mathf.FloorToInt( (float)playableDirector.time);
+        var span = new TimeSpan(0, 0, seconds);
+        var mill = Mathf.FloorToInt(Mathf.Max((float)playableDirector.time - seconds,0)*10);
+        // フォーマットする
+        var hhmmss = span.ToString(@"mm\:ss");
+
+        timeCode.text = $"{hhmmss}:{mill.ToString("00")}";
     }
 
     private TimeMachineControlClipValue currentClipValue => clipValues[currentClipCount];
