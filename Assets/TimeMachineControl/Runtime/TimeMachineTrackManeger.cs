@@ -468,6 +468,11 @@ public class TimeMachineTrackManeger : MonoBehaviour
     {
         MoveClip(currentClipCount + 1);
     }
+
+    public void Play()
+    {
+        playableDirector.Play();
+    }
     public void MovePreviousClip()
     {
         var index = currentClipCount - 1;

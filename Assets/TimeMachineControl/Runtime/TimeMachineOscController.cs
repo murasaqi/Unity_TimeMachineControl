@@ -84,6 +84,7 @@ public class TimeMachineOscController : MonoBehaviour
     public void OnReceiveMoveClipEvent( int index )
     {
         timeMachineTrackManeger.MoveClip(index);
+        timeMachineTrackManeger.Play();
     }
 
     // Update is called once per frame
