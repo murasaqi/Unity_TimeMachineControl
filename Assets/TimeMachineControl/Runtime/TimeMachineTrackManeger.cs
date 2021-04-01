@@ -390,7 +390,7 @@ public class TimeMachineTrackManeger : MonoBehaviour
         var seconds = Mathf.FloorToInt( (float)playableDirector.time);
         var span = new TimeSpan(0, 0, seconds);
         var mill = Mathf.FloorToInt(Mathf.Max((float)playableDirector.time - seconds,0)*10);
-        // ƒtƒH[ƒ}ƒbƒg‚·‚é
+        // ãƒ•ã‚©ãƒ¼ãƒãƒƒãƒˆã™ã‚‹
         var hhmmss = span.ToString(@"mm\:ss");
 
         timeCode.text = $"{hhmmss}:{mill.ToString("00")}";

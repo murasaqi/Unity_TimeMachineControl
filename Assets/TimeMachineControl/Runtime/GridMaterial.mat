@@ -74,8 +74,8 @@ Material:
     - _OcclusionStrength: 1
     - _Parallax: 0.02
     - _Scale: 1
-    - _Scale_U: 21.86
-    - _Scale_V: 1.3333334
+    - _Scale_U: 24.21
+    - _Scale_V: 1
     - _SecondaryFadeInSpeed: 2.43
     - _SmoothnessTextureChannel: 0
     - _SpecularHighlights: 1
